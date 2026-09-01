@@ -48,6 +48,18 @@ public interface OwnerRepository {
     Page<Owner> findByLastName(String lastName, Pageable pageable) throws DataAccessException;
 
     /**
+     * Retrieve <code>Owner</code>s from the data store by last name and/or city, returning all owners whose last name
+     * and city <i>start with</i> the given values. A {@code null} value for either parameter is treated as "no
+     * filter on that field".
+     *
+     * @param lastName Value to search for (may be {@code null})
+     * @param city Value to search for (may be {@code null})
+     * @return a <code>Collection</code> of matching <code>Owner</code>s (or an empty <code>Collection</code> if none
+     * found)
+     */
+    Collection<Owner> findByLastNameAndCity(String lastName, String city) throws DataAccessException;
+
+    /**
      * Retrieve an <code>Owner</code> from the data store by id.
      *
      * @param id the id to search for

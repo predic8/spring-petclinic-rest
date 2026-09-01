@@ -47,6 +47,12 @@ public interface SpringDataOwnerRepository extends OwnerRepository, Repository<O
     Page<Owner> findByLastName(@Param("lastName") String lastName, Pageable pageable);
 
     @Override
+    @Query("SELECT DISTINCT owner FROM Owner owner left join fetch owner.pets "
+        + "WHERE (:lastName IS NULL OR owner.lastName LIKE CONCAT(:lastName, '%')) "
+        + "AND (:city IS NULL OR owner.city LIKE CONCAT(:city, '%'))")
+    Collection<Owner> findByLastNameAndCity(@Param("lastName") String lastName, @Param("city") String city);
+
+    @Override
     @Query(
         value = "SELECT owner FROM Owner owner",
         countQuery = "SELECT COUNT(owner) FROM Owner owner")

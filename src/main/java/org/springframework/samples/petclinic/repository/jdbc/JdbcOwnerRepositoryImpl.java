@@ -112,6 +112,28 @@ public class JdbcOwnerRepositoryImpl implements OwnerRepository {
     }
 
     /**
+     * Loads {@link Owner Owners} from the data store by last name and/or city, returning all owners whose last name
+     * and city <i>start with</i> the given values; also loads the {@link Pet Pets} and {@link Visit Visits} for the
+     * corresponding owners, if not already loaded. A {@code null} value for either parameter is treated as
+     * "no filter on that field".
+     */
+    @Override
+    public Collection<Owner> findByLastNameAndCity(String lastName, String city) throws DataAccessException {
+        Map<String, Object> params = new HashMap<>();
+        params.put("lastName", lastName == null ? null : lastName + "%");
+        params.put("city", city == null ? null : city + "%");
+        List<Owner> owners = this.namedParameterJdbcTemplate.query(
+            "SELECT id, first_name, last_name, address, city, telephone FROM owners "
+                + "WHERE (:lastName IS NULL OR last_name like :lastName) "
+                + "AND (:city IS NULL OR city like :city)",
+            params,
+            BeanPropertyRowMapper.newInstance(Owner.class)
+        );
+        loadOwnersPetsAndVisits(owners);
+        return owners;
+    }
+
+    /**
      * Loads the {@link Owner} with the supplied <code>id</code>; also loads the {@link Pet Pets} and {@link Visit Visits}
      * for the corresponding owner, if not already loaded.
      */

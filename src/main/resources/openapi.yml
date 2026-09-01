@@ -109,6 +109,13 @@ paths:
           schema:
             type: string
             example: Davis
+        - name: city
+          in: query
+          description: City.
+          required: false
+          schema:
+            type: string
+            example: Sunnydale
       responses:
         200:
           description: Owner details found and returned.

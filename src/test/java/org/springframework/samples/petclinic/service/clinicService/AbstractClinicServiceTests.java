@@ -69,6 +69,30 @@ abstract class AbstractClinicServiceTests {
     }
 
     @Test
+    void shouldFindOwnersByCity() {
+        Collection<Owner> owners = this.clinicService.findOwnerByLastNameAndCity(null, "Windsor");
+        assertThat(owners.size()).isEqualTo(1);
+        assertThat(owners.iterator().next().getLastName()).isEqualTo("Davis");
+
+        owners = this.clinicService.findOwnerByLastNameAndCity(null, "Nowhereville");
+        assertThat(owners.isEmpty()).isTrue();
+    }
+
+    @Test
+    void shouldFindOwnersByLastNameAndCity() {
+        Collection<Owner> owners = this.clinicService.findOwnerByLastNameAndCity("Davis", "Windsor");
+        assertThat(owners.size()).isEqualTo(1);
+        assertThat(owners.iterator().next().getCity()).isEqualTo("Windsor");
+
+        owners = this.clinicService.findOwnerByLastNameAndCity("Davis", "Sun Prairie");
+        assertThat(owners.size()).isEqualTo(1);
+        assertThat(owners.iterator().next().getCity()).isEqualTo("Sun Prairie");
+
+        owners = this.clinicService.findOwnerByLastNameAndCity("Davis", "Nowhereville");
+        assertThat(owners.isEmpty()).isTrue();
+    }
+
+    @Test
     void shouldFindSingleOwnerWithPet() {
         Owner owner = this.clinicService.findOwnerById(1);
         assertThat(owner.getLastName()).startsWith("Franklin");

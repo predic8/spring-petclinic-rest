@@ -80,6 +80,17 @@ public class JpaOwnerRepositoryImpl implements OwnerRepository {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public Collection<Owner> findByLastNameAndCity(String lastName, String city) {
+        Query query = this.em.createQuery("SELECT DISTINCT owner FROM Owner owner left join fetch owner.pets "
+            + "WHERE (:lastName IS NULL OR owner.lastName LIKE :lastName) "
+            + "AND (:city IS NULL OR owner.city LIKE :city)");
+        query.setParameter("lastName", lastName == null ? null : lastName + "%");
+        query.setParameter("city", city == null ? null : city + "%");
+        return query.getResultList();
+    }
+
+    @Override
     public Owner findById(int id) {
         // using 'join fetch' because a single query should load both owners and pets
         // using 'left join fetch' because it might happen that an owner does not have pets yet

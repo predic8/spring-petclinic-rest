@@ -176,7 +176,7 @@ class OwnerRestControllerV1Tests {
     void testGetOwnersListSuccess() throws Exception {
         owners.remove(0);
         owners.remove(1);
-        given(this.clinicService.findOwnerByLastName("Davis")).willReturn(ownerMapper.toOwners(owners));
+        given(this.clinicService.findOwnerByLastNameAndCity("Davis", null)).willReturn(ownerMapper.toOwners(owners));
         this.mockMvc.perform(get("/api/owners?lastName=Davis")
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -191,10 +191,52 @@ class OwnerRestControllerV1Tests {
     @WithMockUser(roles = "OWNER_ADMIN")
     void testGetOwnersListNotFound() throws Exception {
         owners.clear();
-        given(this.clinicService.findOwnerByLastName("0")).willReturn(ownerMapper.toOwners(owners));
+        given(this.clinicService.findOwnerByLastNameAndCity("0", null)).willReturn(ownerMapper.toOwners(owners));
         this.mockMvc.perform(get("/api/owners?lastName=0")
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "OWNER_ADMIN")
+    void testGetOwnersListByCitySuccess() throws Exception {
+        owners.remove(0);
+        owners.remove(1);
+        given(this.clinicService.findOwnerByLastNameAndCity(null, "Windsor")).willReturn(ownerMapper.toOwners(owners));
+        this.mockMvc.perform(get("/api/owners?city=Windsor")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType("application/json"))
+            .andExpect(jsonPath("$.[0].id").value(2))
+            .andExpect(jsonPath("$.[0].firstName").value("Betty"))
+            .andExpect(jsonPath("$.[1].id").value(4))
+            .andExpect(jsonPath("$.[1].firstName").value("Harold"));
+    }
+
+    @Test
+    @WithMockUser(roles = "OWNER_ADMIN")
+    void testGetOwnersListByCityNotFound() throws Exception {
+        owners.clear();
+        given(this.clinicService.findOwnerByLastNameAndCity(null, "Nowhereville")).willReturn(ownerMapper.toOwners(owners));
+        this.mockMvc.perform(get("/api/owners?city=Nowhereville")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "OWNER_ADMIN")
+    void testGetOwnersListByLastNameAndCitySuccess() throws Exception {
+        owners.remove(0);
+        owners.remove(1);
+        given(this.clinicService.findOwnerByLastNameAndCity("Davis", "Windsor")).willReturn(ownerMapper.toOwners(owners));
+        this.mockMvc.perform(get("/api/owners?lastName=Davis&city=Windsor")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType("application/json"))
+            .andExpect(jsonPath("$.[0].id").value(2))
+            .andExpect(jsonPath("$.[0].firstName").value("Betty"))
+            .andExpect(jsonPath("$.[1].id").value(4))
+            .andExpect(jsonPath("$.[1].firstName").value("Harold"));
     }
 
     @Test
