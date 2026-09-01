@@ -31,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.PetType;
 import org.springframework.samples.petclinic.repository.PetRepository;
+import org.springframework.samples.petclinic.repository.support.JpaCascadeDeleteSupport;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -86,15 +87,9 @@ public class JpaPetRepositoryImpl implements PetRepository {
         return new PageImpl<>(pets, pageable, total);
     }
 
-	@Override
-	public void delete(Pet pet) throws DataAccessException {
-		//this.em.remove(this.em.contains(pet) ? pet : this.em.merge(pet));
-		String petId = pet.getId().toString();
-		this.em.createQuery("DELETE FROM Visit visit WHERE pet.id=" + petId).executeUpdate();
-		this.em.createQuery("DELETE FROM Pet pet WHERE id=" + petId).executeUpdate();
-		if (em.contains(pet)) {
-			em.remove(pet);
-		}
-	}
+    @Override
+    public void delete(Pet pet) throws DataAccessException {
+        JpaCascadeDeleteSupport.deletePet(this.em, pet);
+    }
 
 }

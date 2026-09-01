@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Specialty;
 import org.springframework.samples.petclinic.repository.SpecialtyRepository;
+import org.springframework.samples.petclinic.repository.support.JpaCascadeDeleteSupport;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -69,12 +70,9 @@ public class JpaSpecialtyRepositoryImpl implements SpecialtyRepository {
         }
 	}
 
-	@Override
-	public void delete(Specialty specialty) throws DataAccessException {
-		this.em.remove(this.em.contains(specialty) ? specialty : this.em.merge(specialty));
-		Integer specId = specialty.getId();
-		this.em.createNativeQuery("DELETE FROM vet_specialties WHERE specialty_id=" + specId).executeUpdate();
-		this.em.createQuery("DELETE FROM Specialty specialty WHERE id=" + specId).executeUpdate();
-	}
+    @Override
+    public void delete(Specialty specialty) throws DataAccessException {
+        JpaCascadeDeleteSupport.deleteSpecialty(this.em, specialty);
+    }
 
 }

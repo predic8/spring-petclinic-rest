@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.repository.VisitRepository;
+import org.springframework.samples.petclinic.repository.support.JpaCascadeDeleteSupport;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -76,9 +77,9 @@ public class JpaVisitRepositoryImpl implements VisitRepository {
         return this.em.createQuery("SELECT v FROM Visit v").getResultList();
 	}
 
-	@Override
-	public void delete(Visit visit) throws DataAccessException {
-        this.em.remove(this.em.contains(visit) ? visit : this.em.merge(visit));
-	}
+    @Override
+    public void delete(Visit visit) throws DataAccessException {
+        JpaCascadeDeleteSupport.deleteVisit(this.em, visit);
+    }
 
 }
